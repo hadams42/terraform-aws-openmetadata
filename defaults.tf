@@ -1,9 +1,9 @@
 # This file contains the default values for each component, depending on the provisioner used.
 
 locals {
-  opensearch_default_provisioner = "helm"
-  db_default_provisioner         = "helm"
-  airflow_default_provisioner    = "helm"
+  opensearch_default_provisioner = "aws"
+  db_default_provisioner         = "aws"
+  airflow_default_provisioner    = "aws"
   # If the Airflow provisioner is set to "existing", the Airflow database provisioner must be also set to "existing"
   airflow_db_default_provisioner = var.airflow.provisioner == "existing" ? "existing" : "helm"
 
@@ -24,7 +24,7 @@ locals {
   opensearch_aws_defaults = {
     aws = {
       availability_zone_count = 2
-      domain_name             = "openmetadata"
+      domain_name             = "openmetadata.itpipes.com"
       engine_version          = "OpenSearch_2.7"
       instance_count          = 2
       instance_type           = "t3.small.search"
@@ -33,7 +33,7 @@ locals {
     credentials = {
       username = "admin"
       password = {
-        secret_ref = "opensearch-credentials"
+        secret_ref = "itpipes-openmetadata-prod-opensearch-credentials"
         secret_key = "password"
       }
     }
@@ -53,7 +53,7 @@ locals {
 
   db_aws_defaults = {
     aws = {
-      identifier              = "openmetadata"
+      identifier              = "itpipes-openmetadata-prod-db"
       instance_class          = "db.t4g.medium"
       multi_az                = true
       maintenance_window      = "Sat:02:00-Sat:03:00"
@@ -67,12 +67,12 @@ locals {
       version = "16"
     }
     port         = 5432
-    db_name      = "openmetadata_db"
+    db_name      = "openmetadata-prod-db"
     storage_size = 50
     credentials = {
       username = "dbadmin"
       password = {
-        secret_ref = "db-secrets"
+        secret_ref = "itpipes-openmetadata-prod-db-secrets"
         secret_key = "password"
       }
     }
@@ -89,7 +89,7 @@ locals {
 
   airflow_db_aws_defaults = {
     aws = {
-      identifier              = "airflow"
+      identifier              = "itpipes-openmetadata-prod-airflow"
       instance_class          = "db.t4g.micro"
       multi_az                = true
       maintenance_window      = "Sat:02:00-Sat:03:00"
@@ -103,23 +103,23 @@ locals {
       version = "16"
     }
     port         = 5432
-    db_name      = "airflow"
+    db_name      = "airflow-prod"
     storage_size = 20
     credentials = {
       username = "dbadmin"
       password = {
-        secret_ref = "airflow-db-secrets"
+        secret_ref = "itpipes-openmetadata-prod-airflow-db-secrets"
         secret_key = "password"
       }
     }
   }
 
   airflow_helm_defaults = {
-    endpoint = "http://openmetadata-deps-web.${var.app_namespace}.svc:8080"
+    endpoint = "http://openmetadata-prod-deps-web.${var.app_namespace}.svc:8080"
     credentials = {
       username = "admin"
       password = {
-        secret_ref = "airflow-auth"
+        secret_ref = "itpipes-openmetadata-prod-airflow-auth"
         secret_key = "password"
       }
     }
@@ -128,12 +128,12 @@ locals {
       dags = 10
     }
     pvc = {
-      logs = "airflow-logs"
-      dags = "airflow-dags"
+      logs = "airflow-prod-logs"
+      dags = "airflow-prod-dags"
     }
     subpath = {
-      logs = "airflow-logs"
-      dags = "airflow-dags"
+      logs = "airflow-prod-logs"
+      dags = "airflow-prod-dags"
     }
     logs_cleanup = {
       enabled     = false
