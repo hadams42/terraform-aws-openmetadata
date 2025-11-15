@@ -11,6 +11,20 @@ module "openmetadata" {
   eks_nodes_sg_ids = var.eks_nodes_sg_ids
   kms_key_id       = var.kms_key_id
 
+  # Switch dependencies to AWS-managed services
+  db = {
+    provisioner = "aws"
+  }
+  airflow = {
+    provisioner = "helm"
+    db = {
+      provisioner = "aws"
+    }
+  }
+  opensearch = {
+    provisioner = "aws"
+  }
+
   depends_on = [
     kubernetes_namespace_v1.app
   ]

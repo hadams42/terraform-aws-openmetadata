@@ -24,7 +24,7 @@ locals {
   opensearch_aws_defaults = {
     aws = {
       availability_zone_count = 2
-      domain_name             = "openmetadata.itpipes.com"
+      domain_name             = "itpipes-openmetadata"
       engine_version          = "OpenSearch_2.7"
       instance_count          = 2
       instance_type           = "t3.small.search"
