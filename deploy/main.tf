@@ -16,15 +16,26 @@ module "openmetadata" {
   # Switch dependencies to AWS-managed services
   db = {
     provisioner = "aws"
+    db_name     = var.db_name
+    aws = {
+      identifier = var.db_identifier
+    }
   }
   airflow = {
     provisioner = "helm"
     db = {
       provisioner = "aws"
+      db_name     = var.airflow_db_name
+      aws = {
+        identifier = var.airflow_db_identifier
+      }
     }
   }
   opensearch = {
     provisioner = "aws"
+    aws = {
+      domain_name = var.opensearch_domain_name
+    }
   }
 
   # Entra ID (Azure AD) OIDC configuration

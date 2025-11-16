@@ -64,4 +64,34 @@ variable "authentication_callback_url" {
   default     = "http://localhost:8585/callback"
 }
 
+variable "db_name" {
+  description = "Database name for the OpenMetadata RDS instance (AWS provisioner). Must be alphanumeric and start with a letter."
+  type        = string
+  default     = "openmetadata"
+}
+
+variable "db_identifier" {
+  description = "Identifier for the OpenMetadata RDS instance (optional)."
+  type        = string
+  default     = null
+}
+
+variable "airflow_db_name" {
+  description = "Database name for the Airflow RDS instance (AWS provisioner). Must be alphanumeric and start with a letter."
+  type        = string
+  default     = "airflow"
+}
+
+variable "airflow_db_identifier" {
+  description = "Identifier for the Airflow RDS instance (optional)."
+  type        = string
+  default     = null
+}
+
+variable "opensearch_domain_name" {
+  description = "AWS OpenSearch domain name (lowercase letters, numbers, hyphens; 3-28 chars, starts with a letter)."
+  type        = string
+  default     = "itpipes-openmetadata"
+}
+
 
