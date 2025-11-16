@@ -67,7 +67,7 @@ locals {
       version = "16"
     }
     port         = 5432
-    db_name      = "openmetadata-prod-db"
+    db_name      = "openmetadataprod"
     storage_size = 50
     credentials = {
       username = "dbadmin"
@@ -103,7 +103,7 @@ locals {
       version = "16"
     }
     port         = 5432
-    db_name      = "airflow-prod"
+    db_name      = "airflow"
     storage_size = 20
     credentials = {
       username = "dbadmin"
