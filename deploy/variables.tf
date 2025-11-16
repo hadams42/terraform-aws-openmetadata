@@ -30,4 +30,38 @@ variable "app_namespace" {
   default     = "openmetadata"
 }
 
+variable "principal_domain" {
+  description = "Domain name of users for OpenMetadata (e.g., itpipes.com)."
+  type        = string
+  default     = "itpipes.com"
+}
+
+variable "initial_admins" {
+  description = "List of initial admin usernames (without domain), as a string list literal. Example: \"[admin]\"."
+  type        = string
+  default     = "[admin]"
+}
+
+variable "authentication_tenant_id" {
+  description = "Azure Entra ID (Azure AD) Tenant ID for OIDC."
+  type        = string
+}
+
+variable "authentication_client_id" {
+  description = "Azure Entra ID application (client) ID for OpenMetadata OIDC."
+  type        = string
+}
+
+variable "authentication_client_secret" {
+  description = "Azure Entra ID application client secret for OpenMetadata OIDC."
+  type        = string
+  sensitive   = true
+}
+
+variable "authentication_callback_url" {
+  description = "OpenMetadata OIDC callback URL (e.g., http://localhost:8585/callback or https://openmetadata.yourdomain/callback)."
+  type        = string
+  default     = "http://localhost:8585/callback"
+}
+
 

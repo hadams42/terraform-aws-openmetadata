@@ -75,7 +75,14 @@ cd examples/complete
 terraform init
 terraform plan
 terraform apply
+
+kubectl -n itpipes-openmetadata get pods
+kubectl -n itpipes-openmetadata rollout status deploy/openmetadata
+kubectl -n itpipes-openmetadata port-forward svc/openmetadata 8585:8585
+# Open http://localhost:8585
 ```
+
+
 
 3) Access the UIs
 
@@ -93,6 +100,25 @@ kubectl port-forward service/openmetadata-deps-web -n <your-namespace> 8080:8080
 
 ```bash
 terraform destroy
+```
+
+5) Initial OpenMetadata login 
+
+```
+admin@open-metadata.org  (no password)
+```
+
+6) Access Airflow password for "admin"
+
+```bash
+# bash
+kubectl -n itpipes-openmetadata get secret itpipes-openmetadata-prod-airflow-auth -o jsonpath='{.data.password}' | base64 -d; echo
+```
+
+```powershell
+# powershell
+$raw = kubectl -n itpipes-openmetadata get secret itpipes-openmetadata-prod-airflow-auth -o jsonpath="{.data.password}"
+[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($raw))
 ```
 
 
