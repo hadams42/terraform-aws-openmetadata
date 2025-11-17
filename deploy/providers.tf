@@ -15,6 +15,13 @@ terraform {
 
 provider "aws" {
   region = var.region
+  default_tags {
+    tags = {
+      itp_client_account_name   = "ITpipes internal"
+      itp_client_account_id     = "001JR00000bJwkaYAC"
+      itp_client_account_status = "active"
+    }
+  }
 }
 
 provider "kubernetes" {
