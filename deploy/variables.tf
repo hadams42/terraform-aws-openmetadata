@@ -94,4 +94,9 @@ variable "opensearch_domain_name" {
   default     = "itpipes-openmetadata"
 }
 
+variable "eks_cluster_name" {
+  description = "Name of the existing EKS cluster where OpenMetadata is deployed."
+  type        = string
+}
+
 

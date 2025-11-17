@@ -51,7 +51,8 @@ module "openmetadata" {
 
   depends_on = [
     kubernetes_namespace_v1.app,
-    kubernetes_secret_v1.om_auth
+    kubernetes_secret_v1.om_auth,
+    aws_eks_addon.efs_csi
   ]
 
 }
