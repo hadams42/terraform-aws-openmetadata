@@ -155,12 +155,12 @@ terraform destroy
 
 ```bash
 # bash
-kubectl -n itpipes-openmetadata get secret itpipes-openmetadata-prod-airflow-auth -o jsonpath='{.data.password}' | base64 -d; echo
+kubectl -n itpipes-openmetadata get secret airflow-auth -o jsonpath='{.data.password}' | base64 -d; echo
 ```
 
 ```powershell
 # powershell
-$raw = kubectl -n itpipes-openmetadata get secret itpipes-openmetadata-prod-airflow-auth -o jsonpath="{.data.password}"
+$raw = kubectl -n itpipes-openmetadata get secret airflow-auth -o jsonpath="{.data.password}"
 [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($raw))
 ```
 
