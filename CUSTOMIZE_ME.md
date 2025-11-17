@@ -1,3 +1,5 @@
+_This document has been created to facilitate deploying Open Metadata within an ITpipes EKS environment._
+
 ### CUSTOMIZE_ME: Deploy OpenMetadata on AWS with Terraform
 
 This repository is a Terraform module that deploys OpenMetadata on AWS with flexible provisioners for each component (OpenMetadata app, databases, Airflow, and OpenSearch). Use this guide to customize and deploy it safely.
@@ -10,6 +12,41 @@ This repository is a Terraform module that deploys OpenMetadata on AWS with flex
   - OpenSearch domain
   - EFS volumes for Airflow (when Airflow via Helm)
 - Kubernetes secrets, storage classes (when Helm), and sensible defaults.
+
+
+### Recommended: Use the deploy/ stack (single place to customize)
+- Customize only these files:
+  - `deploy/terraform.tfvars` → your values (region, VPC/subnets/SGs, domain, admins, Entra ID, DB names, OpenSearch domain)
+  - `deploy/variables.tf` → variable definitions (no changes required unless you want different defaults)
+  - `deploy/main.tf` → already wired to use AWS RDS (OpenMetadata + Airflow), AWS OpenSearch, and OIDC
+- Do not edit module defaults in the repo root (`defaults.tf`) for environment-specific settings. Keep customizations in `deploy/`.
+
+Quickstart
+
+```bash
+cd deploy
+# 1) Edit terraform.tfvars with:
+#    - VPC/subnets/SGs (for EFS/RDS/OpenSearch reachability)
+#    - principal_domain, initial_admins
+#    - Entra ID: authentication_tenant_id, authentication_client_id, authentication_client_secret, authentication_callback_url
+#    - db_name, airflow_db_name, opensearch_domain_name
+
+terraform init
+terraform plan -out tfplan
+terraform apply "tfplan"
+
+# Wait for pods (namespace set in terraform.tfvars; default in this repo: itpipes-openmetadata)
+kubectl -n itpipes-openmetadata get pods
+kubectl -n itpipes-openmetadata rollout status deploy/openmetadata
+
+# OpenMetadata UI
+kubectl -n itpipes-openmetadata port-forward svc/openmetadata 8585:8585
+# http://localhost:8585
+
+# Airflow UI (when deployed via Helm dependencies)
+kubectl -n itpipes-openmetadata port-forward svc/openmetadata-deps-web 8080:8080
+# http://localhost:8080
+```
 
 
 ### Prerequisites
@@ -38,7 +75,7 @@ Notes:
 
 
 ### Key inputs you will likely set
-- app_namespace: Kubernetes namespace to deploy into (default: "openmetadata")
+- app_namespace: Kubernetes namespace to deploy into (this repo’s deploy stack default: "itpipes-openmetadata")
 - app_version / app_helm_chart_version: App and/or chart version (defaults to 1.10.6)
 - docker_image_name / docker_image_tag: Optional image override (defaults provided; tag falls back to app_version)
 - principal_domain, initial_admins: User bootstrap for OpenMetadata
@@ -47,6 +84,10 @@ Notes:
 - subnet_ids, vpc_id: Subnets and VPC for AWS resources (recommend private subnets)
 - kms_key_id: Optional AWS KMS key ARN for encryption (RDS/EFS/OpenSearch)
 - db, airflow.db, opensearch: Component-specific settings (engine/version/storage size/credentials/etc.) varying by provisioner
+- If using the deploy stack with AWS-managed deps, also set:
+  - db_name (OpenMetadata), airflow_db_name (Airflow), opensearch_domain_name
+- If enabling Entra ID (Azure AD) SSO, also set:
+  - authentication_tenant_id, authentication_client_id, authentication_client_secret, authentication_callback_url
 
 Refer to `README_terraform.md` for the full input table.
 
@@ -76,10 +117,11 @@ terraform init
 terraform plan
 terraform apply
 
-kubectl -n itpipes-openmetadata get pods
-kubectl -n itpipes-openmetadata rollout status deploy/openmetadata
-kubectl -n itpipes-openmetadata port-forward svc/openmetadata 8585:8585
-# Open http://localhost:8585
+# Replace <your-namespace> with what you configured in the example
+kubectl -n <your-namespace> get pods
+kubectl -n <your-namespace> rollout status deploy/openmetadata
+kubectl -n <your-namespace> port-forward svc/openmetadata 8585:8585
+# http://localhost:8585
 ```
 
 
@@ -102,11 +144,12 @@ kubectl port-forward service/openmetadata-deps-web -n <your-namespace> 8080:8080
 terraform destroy
 ```
 
-5) Initial OpenMetadata login 
-
-```
-admin@open-metadata.org  (no password)
-```
+5) Initial OpenMetadata login
+- If OIDC (Azure) is configured in deploy:
+  - Click “Sign in with Azure” on http://localhost:8585
+  - Your first admin will be `<admin>@<principal_domain>` (e.g., `admin@itpipes.com`)
+- If no auth is configured:
+  - First user is created without a password prompt. You can set auth later.
 
 6) Access Airflow password for "admin"
 
@@ -201,6 +244,11 @@ terraform apply
 - OpenMetadata app
   - app_namespace, app_version, app_helm_chart_version, docker_image_name, docker_image_tag, principal_domain, initial_admins
   - env_from (list of Kubernetes secrets to import as env), extra_envs (key/value map)
+  - OIDC (Entra ID) via deploy stack extra envs:
+    - AUTHENTICATION_PROVIDER="azure"
+    - AUTHENTICATION_AUTHORITY, AUTHENTICATION_PUBLIC_KEY_URLS (built from `authentication_tenant_id`)
+    - AUTHENTICATION_CLIENT_ID, AUTHENTICATION_CALLBACK_URL
+    - AUTHENTICATION_CLIENT_SECRET (from `om-auth` secret), JWT_PRINCIPAL_CLAIM="email"
 
 - Databases (OpenMetadata and Airflow)
   - provisioner = "helm" | "aws" | "existing"
@@ -208,12 +256,14 @@ terraform apply
   - storage_size, port, db_name
   - credentials.username, credentials.password.secret_ref, credentials.password.secret_key
   - For AWS: instance_class, multi_az, backup windows, deletion protection, etc.
+  - With deploy stack (AWS-managed): set `db_name`, `airflow_db_name` (must start with a letter, alphanumeric only)
 
 - OpenSearch
   - provisioner = "helm" | "aws" | "existing"
   - For AWS: domain sizing (instance_type/count), engine_version, AZ count, TLS policy
   - For Existing: host, scheme, port, credentials
   - For Helm: volume_size and storage_class (optional)
+  - With deploy stack (AWS-managed): set `opensearch_domain_name` (3–28 chars, start with letter, a–z0–9–)
 
 - Networking and encryption (AWS provisioners)
   - eks_nodes_sg_ids: EKS node security group IDs that must be allowed by RDS/EFS/OpenSearch SGs
@@ -235,6 +285,7 @@ terraform apply
 - RDS/OpenSearch creation failures: check VPC/subnets/SGs/KMS permissions and that `eks_nodes_sg_ids` are correct for reachability.
 - Helm install failures: ensure the namespace exists and that the helm provider is pointing at the correct cluster/context.
 - Secrets not found (Existing provisioners): create the referenced Kubernetes secrets with the names/keys you configured.
+- In-cluster storage (if you switch to Helm for DB/OpenSearch): ensure EBS CSI driver and a default StorageClass exist; EFS CSI driver is required for Airflow EFS PVCs.
 
 
 ### Cleanup
