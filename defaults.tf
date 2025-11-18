@@ -53,7 +53,7 @@ locals {
 
   db_aws_defaults = {
     aws = {
-      identifier              = "openmetadata"
+      identifier              = "itpipes-openmetadata"
       instance_class          = "db.t4g.medium"
       multi_az                = true
       maintenance_window      = "Sat:02:00-Sat:03:00"
@@ -89,7 +89,7 @@ locals {
 
   airflow_db_aws_defaults = {
     aws = {
-      identifier              = "airflow"
+      identifier              = "itpipes-openmetadata-airflow"
       instance_class          = "db.t4g.micro"
       multi_az                = true
       maintenance_window      = "Sat:02:00-Sat:03:00"

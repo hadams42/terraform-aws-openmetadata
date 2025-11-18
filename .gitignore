@@ -41,3 +41,5 @@ terraform.rc
 
 .vscode/
 .envrc
+deploy/auth.txt
+deploy/logs.txt
