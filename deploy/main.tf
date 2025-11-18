@@ -18,7 +18,8 @@ module "openmetadata" {
     provisioner = "aws"
     db_name     = var.db_name
     aws = {
-      identifier = var.db_identifier
+      identifier          = var.db_identifier
+      deletion_protection = false
     }
   }
   airflow = {
@@ -27,7 +28,8 @@ module "openmetadata" {
       provisioner = "aws"
       db_name     = var.airflow_db_name
       aws = {
-        identifier = var.airflow_db_identifier
+        identifier          = var.airflow_db_identifier
+        deletion_protection = false
       }
     }
   }
