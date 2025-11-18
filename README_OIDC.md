@@ -47,32 +47,7 @@ Notes
 
 
 ### 3) Configure the deploy/ stack
-All customizations are centralized in `deploy/terraform.tfvars`. Fill in these values:
-
-```hcl
-# Required: your namespace and identity settings
-app_namespace          = "itpipes-openmetadata"
-principal_domain       = "itpipes.com"
-initial_admins         = "[admin]"
-
-# Entra ID (Azure AD) OIDC
-authentication_tenant_id     = "<TENANT_ID>"
-authentication_client_id     = "<CLIENT_ID>"
-authentication_client_secret = "<CLIENT_SECRET>"   # sensitive
-authentication_callback_url  = "https://<your-openmetadata-host>/callback" # or http://localhost:8585/callback
-
-# Networking for AWS-managed resources (already present in your tfvars)
-region               = "us-west-2"
-vpc_id               = "vpc-xxxxxxxx"
-subnet_ids           = ["subnet-aaaa", "subnet-bbbb"]
-eks_nodes_sg_ids     = ["sg-xxxxxxxx"]
-kms_key_id           = null
-
-# AWS-managed dependencies (already wired in deploy/main.tf)
-db_name                = "openmetadataprod"
-airflow_db_name        = "airflow"
-opensearch_domain_name = "itpipes-openmetadata"
-```
+All customizations are centralized in `deploy/terraform.tfvars`. F
 
 What the deploy stack does
 - `deploy/oidc.tf` creates a Kubernetes secret `om-auth` in your namespace that stores `AUTHENTICATION_CLIENT_SECRET`.

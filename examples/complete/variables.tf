@@ -27,7 +27,7 @@ variable "airflow" {
       port         = 5432
       db_name      = "airflow"
       aws = {
-        identifier              = "airflow"
+        identifier              = "itpipes-openmetadata-airflow"
         instance_class          = "db.t4g.micro"
         maintenance_window      = "Sat:02:00-Sat:03:00"
         backup_window           = "03:00-04:00"
@@ -81,7 +81,7 @@ variable "db" {
   default = {
     provisioner = "aws"
     aws = {
-      identifier              = "openmetadata"
+      identifier              = "itpipes-openmetadata"
       instance_class          = "db.t4g.medium"
       maintenance_window      = "Sat:02:00-Sat:03:00"
       backup_window           = "03:00-04:00"

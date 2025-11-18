@@ -43,3 +43,4 @@ terraform.rc
 .envrc
 deploy/auth.txt
 deploy/logs.txt
+deploy/tfplan
