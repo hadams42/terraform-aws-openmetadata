@@ -40,18 +40,11 @@ module "openmetadata" {
     }
   }
 
-  # Entra ID (Azure AD) OIDC configuration
-  env_from = ["om-auth"]
+  # Temporary: disable SSO so we can configure Azure in the UI
+  # (we'll switch this back to "azure" after UI configuration)
+  env_from = []
   extra_envs = {
-    AUTHENTICATION_PROVIDER         = "azure"
-    AUTHENTICATION_AUTHORITY        = "https://login.microsoftonline.com/${var.authentication_tenant_id}/v2.0"
-    # Use Azure JWKS only; disable static public keys
-    AUTHENTICATION_PUBLIC_KEYS      = "[]"
-    AUTHENTICATION_PUBLIC_KEY_URLS  = "https://login.microsoftonline.com/${var.authentication_tenant_id}/discovery/v2.0/keys"
-    AUTHENTICATION_RESPONSE_TYPE    = "code"
-    AUTHENTICATION_CLIENT_ID        = var.authentication_client_id
-    AUTHENTICATION_CALLBACK_URL     = var.authentication_callback_url
-    JWT_PRINCIPAL_CLAIM             = "email"
+    AUTHENTICATION_PROVIDER = "no_auth"
   }
 
   depends_on = [
