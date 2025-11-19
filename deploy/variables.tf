@@ -13,11 +13,6 @@ variable "subnet_ids" {
   type        = list(string)
 }
 
-variable "eks_nodes_sg_ids" {
-  description = "Security group IDs attached to the EKS nodes (allow inbound from nodes)."
-  type        = list(string)
-}
-
 variable "kms_key_id" {
   description = "Optional KMS key ARN for encryption of AWS resources."
   type        = string
@@ -95,7 +90,7 @@ variable "opensearch_domain_name" {
 }
 
 variable "eks_cluster_name" {
-  description = "Name of the existing EKS cluster where OpenMetadata is deployed."
+  description = "Name for the EKS cluster to create."
   type        = string
 }
 

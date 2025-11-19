@@ -3,6 +3,7 @@ terraform {
   required_providers {
     aws = {
       source = "hashicorp/aws"
+      # Version is constrained in the root module; keep it flexible here.
     }
     kubernetes = {
       source = "hashicorp/kubernetes"
@@ -15,6 +16,7 @@ terraform {
 
 provider "aws" {
   region = var.region
+
   default_tags {
     tags = {
       itp_client_account_name   = "ITpipes internal"
@@ -25,14 +27,24 @@ provider "aws" {
 }
 
 provider "kubernetes" {
-  # Uses your default kubeconfig context
-  config_path = "~/.kube/config"
+  host                   = aws_eks_cluster.openmetadata.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.openmetadata.certificate_authority[0].data)
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = ["eks", "get-token", "--cluster-name", var.eks_cluster_name, "--region", var.region]
+  }
 }
 
 provider "helm" {
   kubernetes = {
-    config_path = "~/.kube/config"
+    host                   = aws_eks_cluster.openmetadata.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.openmetadata.certificate_authority[0].data)
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args        = ["eks", "get-token", "--cluster-name", var.eks_cluster_name, "--region", var.region]
+    }
   }
 }
-
-
