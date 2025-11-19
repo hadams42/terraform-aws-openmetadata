@@ -44,3 +44,4 @@ terraform.rc
 deploy/auth.txt
 deploy/logs.txt
 deploy/tfplan
+*.log
