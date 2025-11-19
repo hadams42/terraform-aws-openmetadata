@@ -45,7 +45,10 @@ module "openmetadata" {
   extra_envs = {
     AUTHENTICATION_PROVIDER         = "azure"
     AUTHENTICATION_AUTHORITY        = "https://login.microsoftonline.com/${var.authentication_tenant_id}/v2.0"
+    # Use Azure JWKS only; disable static public keys
+    AUTHENTICATION_PUBLIC_KEYS      = "[]"
     AUTHENTICATION_PUBLIC_KEY_URLS  = "https://login.microsoftonline.com/${var.authentication_tenant_id}/discovery/v2.0/keys"
+    AUTHENTICATION_RESPONSE_TYPE    = "code"
     AUTHENTICATION_CLIENT_ID        = var.authentication_client_id
     AUTHENTICATION_CALLBACK_URL     = var.authentication_callback_url
     JWT_PRINCIPAL_CLAIM             = "email"
