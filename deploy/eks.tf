@@ -54,7 +54,10 @@ resource "aws_eks_cluster" "openmetadata" {
 # EKS managed node group
 resource "aws_eks_node_group" "nodes" {
   cluster_name    = local.eks_cluster_name
-  node_group_name = "eks-nodes"
+  # Use a name derived from the cluster so replacements can safely create a
+  # new node group without colliding with an existing one that used a
+  # different name (e.g., a previous \"eks-nodes\" group).
+  node_group_name = "${local.eks_cluster_name}-nodes"
   node_role_arn   = aws_iam_role.eks_nodes.arn
   subnet_ids      = var.subnet_ids
 
@@ -66,6 +69,13 @@ resource "aws_eks_node_group" "nodes" {
     desired_size = 2
     max_size     = 3
     min_size     = 2
+  }
+
+  # When changing fields that force replacement (such as ami_type),
+  # destroy the old node group before creating the new one to avoid
+  # name conflicts in EKS (NodeGroup already exists).
+  lifecycle {
+    create_before_destroy = false
   }
 
   update_config {

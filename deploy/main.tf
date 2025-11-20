@@ -41,11 +41,13 @@ module "openmetadata" {
     }
   }
 
-  # Temporary: disable SSO so we can configure Azure in the UI
-  # (we'll switch this back to "azure" after UI configuration)
+  # Use OpenMetadata Basic Auth as described in the docs:
+  # https://docs.open-metadata.org/latest/deployment/security/basic-auth
+  # Authentication provider is set via environment variable, while
+  # admin principals and principal domain are provided through Helm values.
   env_from = []
   extra_envs = {
-    AUTHENTICATION_PROVIDER = "no_auth"
+    AUTHENTICATION_PROVIDER = "basic"
   }
 
   depends_on = [
