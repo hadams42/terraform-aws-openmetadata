@@ -1,6 +1,6 @@
 locals {
   eks_cluster_name              = var.eks_cluster_name
-  eks_version                   = "1.31"
+  eks_version                   = "1.33"
   eks_cidr                      = "10.100.0.0/24"
   eks_node_group_instance_types = ["t3.xlarge"]
   eks_nodes_disk_size           = 20
@@ -60,7 +60,7 @@ resource "aws_eks_node_group" "nodes" {
 
   disk_size      = local.eks_nodes_disk_size
   instance_types = local.eks_node_group_instance_types
-  ami_type       = "AL2_x86_64"
+  ami_type       = "AL2023_x86_64_STANDARD"
 
   scaling_config {
     desired_size = 2

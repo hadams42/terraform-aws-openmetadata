@@ -128,8 +128,8 @@ locals {
       dags = 10
     }
     pvc = {
-      logs = "airflow-logs"
-      dags = "airflow-dags"
+      logs = "itpipes-openmetadata-airflow-logs"
+      dags = "itpipes-openmetadata-airflow-dags"
     }
     subpath = {
       logs = "airflow-logs"

@@ -46,3 +46,6 @@ deploy/logs.txt
 deploy/tfplan
 *.log
 tfplan
+deploy/aws
+deploy/awscliv2.zip
+examples
