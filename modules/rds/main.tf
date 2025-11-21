@@ -35,6 +35,7 @@ module "rds" {
   apply_immediately                   = true
   iam_database_authentication_enabled = true
   multi_az                            = var.db_config.aws.multi_az
+  publicly_accessible                 = true
 
   maintenance_window      = var.db_config.aws.maintenance_window
   backup_window           = var.db_config.aws.backup_window
@@ -69,6 +70,16 @@ module "sg_db" {
       protocol                 = "tcp"
       description              = "DB from ${sg_id}"
       source_security_group_id = sg_id
+    }
+  ]
+
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 5432
+      to_port     = 5432
+      protocol    = "tcp"
+      description = "DB access from 96.92.235.142"
+      cidr_blocks = "96.92.235.142/32"
     }
   ]
 }
