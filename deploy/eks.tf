@@ -37,6 +37,11 @@ resource "aws_eks_cluster" "openmetadata" {
   }
 }
 
+# TLS certificate for the EKS OIDC issuer (used by IAM OIDC provider)
+data "tls_certificate" "cluster" {
+  url = one(aws_eks_cluster.openmetadata[*].identity[0].oidc[0].issuer)
+}
+
 # EKS OIDC provider
 
 resource "aws_iam_openid_connect_provider" "this" {
