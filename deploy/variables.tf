@@ -37,28 +37,6 @@ variable "initial_admins" {
   default     = "[admin]"
 }
 
-variable "authentication_tenant_id" {
-  description = "Azure Entra ID (Azure AD) Tenant ID for OIDC."
-  type        = string
-}
-
-variable "authentication_client_id" {
-  description = "Azure Entra ID application (client) ID for OpenMetadata OIDC."
-  type        = string
-}
-
-variable "authentication_client_secret" {
-  description = "Azure Entra ID application client secret for OpenMetadata OIDC."
-  type        = string
-  sensitive   = true
-}
-
-variable "authentication_callback_url" {
-  description = "OpenMetadata OIDC callback URL (e.g., http://localhost:8585/callback or https://openmetadata.yourdomain/callback)."
-  type        = string
-  default     = "http://localhost:8585/callback"
-}
-
 variable "db_name" {
   description = "Database name for the OpenMetadata RDS instance (AWS provisioner). Must be alphanumeric and start with a letter."
   type        = string
