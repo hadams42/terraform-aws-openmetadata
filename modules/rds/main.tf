@@ -8,7 +8,7 @@ resource "random_password" "db_password" {
   min_special      = 1
   special          = true
   # YAML-safe special characters only - excludes quotes, backslashes, and other problematic chars
-  override_special = "!@#$%^&*()-_=+[]{}:?"
+  override_special = "!#$%^&*()-_=+[]{}:?"
 }
 
 module "rds" {
