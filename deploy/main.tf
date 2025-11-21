@@ -10,8 +10,8 @@ module "openmetadata" {
   # Networking required for AWS-managed deps and for Airflow (Helm) EFS volumes
   vpc_id           = var.vpc_id
   subnet_ids       = var.subnet_ids
-  # Use the EKS node security group created in this deployment so DB/OpenSearch allow traffic from nodes
-  eks_nodes_sg_ids = [aws_security_group.eks_nodes.id]
+  # Use the EKS cluster security group so DB/OpenSearch allow traffic from nodes
+  eks_nodes_sg_ids = [local.eks_nodes_sg_id]
   kms_key_id       = var.kms_key_id
 
   # Switch dependencies to AWS-managed services

@@ -4,6 +4,7 @@ locals {
   eks_cidr                      = "10.100.0.0/24"
   eks_node_group_instance_types = ["t3.xlarge"]
   eks_nodes_disk_size           = 20
+  # EKS cluster security group ID (used by RDS/OpenSearch/other modules)
   eks_nodes_sg_id               = aws_eks_cluster.openmetadata.vpc_config[0].cluster_security_group_id
 }
 
