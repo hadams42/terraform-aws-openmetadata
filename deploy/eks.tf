@@ -4,20 +4,7 @@ locals {
   eks_cidr                      = "10.100.0.0/24"
   eks_node_group_instance_types = ["t3.xlarge"]
   eks_nodes_disk_size           = 20
-}
-
-# Security group for EKS nodes, used by RDS/OpenSearch/EFS security groups
-resource "aws_security_group" "eks_nodes" {
-  name        = "${local.eks_cluster_name}-nodes"
-  description = "Security group for EKS worker nodes"
-  vpc_id      = var.vpc_id
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  eks_nodes_sg_id               = aws_eks_cluster.openmetadata.vpc_config[0].cluster_security_group_id
 }
 
 # EKS cluster
@@ -45,18 +32,23 @@ resource "aws_eks_cluster" "openmetadata" {
 
   vpc_config {
     subnet_ids              = var.subnet_ids
-    security_group_ids      = [aws_security_group.eks_nodes.id]
     endpoint_private_access = true
     public_access_cidrs     = ["0.0.0.0/0"]
   }
 }
 
-# EKS managed node group
+# EKS OIDC provider
+
+resource "aws_iam_openid_connect_provider" "this" {
+  url             = aws_eks_cluster.openmetadata.identity[0].oidc[0].issuer
+  thumbprint_list = [one(data.tls_certificate.cluster[*].certificates[0].sha1_fingerprint)]
+  client_id_list  = ["sts.amazonaws.com"]
+}
+
+# EKS node group
+
 resource "aws_eks_node_group" "nodes" {
   cluster_name    = local.eks_cluster_name
-  # Use a name derived from the cluster so replacements can safely create a
-  # new node group without colliding with an existing one that used a
-  # different name (e.g., a previous \"eks-nodes\" group).
   node_group_name = "${local.eks_cluster_name}-nodes"
   node_role_arn   = aws_iam_role.eks_nodes.arn
   subnet_ids      = var.subnet_ids
@@ -71,9 +63,6 @@ resource "aws_eks_node_group" "nodes" {
     min_size     = 2
   }
 
-  # When changing fields that force replacement (such as ami_type),
-  # destroy the old node group before creating the new one to avoid
-  # name conflicts in EKS (NodeGroup already exists).
   lifecycle {
     create_before_destroy = false
   }
